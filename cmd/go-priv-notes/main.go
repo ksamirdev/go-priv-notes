@@ -1,16 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"net"
 	"net/http"
 
+	"github.com/samocodes/go-priv-notes/db"
 	"github.com/samocodes/go-priv-notes/env"
 	"github.com/samocodes/go-priv-notes/internal/api"
 )
 
 func init() {
 	env.Load()
+	db.Load()
 }
 
 type Application struct {
@@ -18,14 +20,12 @@ type Application struct {
 }
 
 func (app *Application) Serve() error {
-	port := app.config.PORT
-
-	log.Printf("🚀 Server listening to port %s", port)
-
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%s", port),
+		Addr:    net.JoinHostPort("localhost", app.config.PORT),
 		Handler: api.Router(),
 	}
+
+	log.Printf("🚀 Server listening to port %s", app.config.PORT)
 
 	return srv.ListenAndServe()
 }
