@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net"
 	"net/http"
@@ -12,30 +13,34 @@ import (
 
 func init() {
 	env.Load()
-	db.Load()
 }
 
 type Application struct {
 	config env.Config
+	db     *sql.DB
 }
 
 func (app *Application) Serve() error {
 	srv := &http.Server{
 		Addr:    net.JoinHostPort("localhost", app.config.PORT),
-		Handler: api.Router(),
+		Handler: api.Router(app.db),
 	}
 
-	log.Printf("🚀 Server listening to port %s", app.config.PORT)
+	log.Printf("[api] 🚀 listening to port %s", app.config.PORT)
 
 	return srv.ListenAndServe()
 }
 
 func main() {
+	db := db.Load()
+	defer db.Close()
+
 	app := Application{
 		config: env.DefaultConfig,
+		db:     db,
 	}
 
 	if err := app.Serve(); err != nil {
-		log.Fatalf("Error starting server: %s\n", err.Error())
+		log.Fatalf("[api] Error starting: %s\n", err.Error())
 	}
 }

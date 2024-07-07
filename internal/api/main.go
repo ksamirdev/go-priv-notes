@@ -1,13 +1,14 @@
 package api
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func Router() http.Handler {
+func Router(db *sql.DB) http.Handler {
 	router := chi.NewRouter()
 
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -15,8 +16,8 @@ func Router() http.Handler {
 	})
 
 	router.Route("/api/v1", func(r chi.Router) {
-		r.Mount("/users", userResource{}.Routes())
-		r.Mount("/notes", notesResources{}.Routes())
+		r.Mount("/user", UserRouter(db))
+		r.Mount("/note", NoteRouter(db))
 	})
 
 	return router

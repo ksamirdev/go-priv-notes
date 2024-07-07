@@ -1,6 +1,10 @@
 package crypto
 
-import "testing"
+import (
+	"testing"
+
+	"gotest.tools/v3/assert"
+)
 
 func TestAESEncrypt(t *testing.T) {
 	v := "123456"
@@ -21,4 +25,5 @@ func TestAESEncrypt(t *testing.T) {
 
 	t.Log("Decoded Value: ", decodedValue)
 
+	assert.Equal(t, cipher, decodedValue)
 }

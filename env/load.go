@@ -17,17 +17,17 @@ var DefaultConfig Config
 func Load() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		log.Fatalf("[env] Error loading file: %v", err)
 	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatalln("$PORT must be set")
+		log.Fatalln("[env] $PORT must be set")
 	}
 
 	env := os.Getenv("ENVIRONMENT")
 	if port == "" {
-		log.Fatalln("$ENVIRONMENT must be set")
+		log.Fatalln("[env] $ENVIRONMENT must be set")
 	}
 
 	DefaultConfig = Config{
@@ -35,5 +35,5 @@ func Load() {
 		ENVIRONMENT: env,
 	}
 
-	log.Println("Loaded .env!")
+	log.Println("[env] loaded!")
 }
