@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Private Notes</title>
+        <link href="./dist/main.css" rel="stylesheet" />
+
+        <!-- GOOGLE FONTS -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+            rel="stylesheet"
+        />
+        <!-- GOOGLE FONTS END -->
+    </head>
+    <body class="container space-y-4 font-poppins py-5">
+        <h1 class="text-5xl text-center font-bold underline decoration-wavy">
+            Private Notes
+        </h1>
+
+        <div class="grid grid-cols-2 gap-5 items-start">
+            <form
+                method="GET"
+                action="/user/notes"
+                class="border-2 border-primary rounded-xl p-5 flex flex-col gap-3 bg-neutral-50"
+            >
+                <h3 class="text-xl font-bold underline">List Notes</h3>
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    class="border px-2 py-1 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                />
+                <input
+                    type="text"
+                    inputmode="numeric"
+                    name="pin"
+                    placeholder="PIN"
+                    class="border px-2 py-1 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                />
+                <button
+                    type="submit"
+                    class="bg-primary py-2 rounded-lg text-white outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                >
+                    List notes
+                </button>
+            </form>
+
+            <form
+                class="border-2 border-primary rounded-xl p-5 flex flex-col gap-3 bg-neutral-50"
+            >
+                <h3 class="text-xl font-bold underline">Send Note</h3>
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    class="border px-2 py-1 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                />
+                <textarea
+                    class="border px-2 py-1 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    name="content"
+                    placeholder="Content"
+                    rows="3"
+                ></textarea>
+                <button
+                    type="submit"
+                    class="bg-primary py-2 rounded-lg text-white outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                >
+                    Send note
+                </button>
+            </form>
+        </div>
+    </body>
+</html>

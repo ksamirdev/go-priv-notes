@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -12,6 +13,14 @@ import (
 	"github.com/samocodes/go-priv-notes/helpers"
 	"github.com/samocodes/go-priv-notes/types"
 )
+
+type NotesResponse struct {
+	Error   bool
+	Message string
+
+	Username string
+	Notes    []types.NotesTable
+}
 
 func UserRouter(db *sql.DB) chi.Router {
 	r := chi.NewRouter()
@@ -24,14 +33,20 @@ func UserRouter(db *sql.DB) chi.Router {
 		username := r.URL.Query().Get("username")
 		pin := r.URL.Query().Get("pin")
 
+		tmpl := template.Must(template.ParseFiles("internal/template/notes.html"))
+
 		if !helpers.IsValidUsername(username) || !helpers.IsValidPin(pin) {
-			http.Error(w, "Either username or pin is invalid", http.StatusUnauthorized)
+			tmpl.Execute(w, NotesResponse{Error: true, Message: "Either username or pin is invalid", Username: username})
+
+			// http.Error(w, "Either username or pin is invalid", http.StatusUnauthorized)
 			return
 		}
 
 		// check if user exists or create one
 		if err := execUser(username, pin, db); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			tmpl.Execute(w, NotesResponse{Error: true, Message: err.Error(), Username: username})
+
+			// http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -42,14 +57,14 @@ func UserRouter(db *sql.DB) chi.Router {
 			return
 		}
 
-		fmt.Fprint(w, notes)
+		tmpl.Execute(w, NotesResponse{Username: username, Notes: notes, Error: false})
 	})
 
 	return r
 }
 
 func createUser(username, pin string, db *sql.DB) error {
-	hashedPin, err := crypto.AESEncrypt(pin)
+	hashedPin, err := crypto.Encrypt(pin)
 	if err != nil {
 		return err
 	}
@@ -79,12 +94,12 @@ func execUser(username, pin string, db *sql.DB) error {
 			return nil
 		}
 
-		return fmt.Errorf("invalid user credentials")
+		return fmt.Errorf("Invalid user credentials")
 	}
 
-	p, err := crypto.AESDecrypt(user.Pin)
+	p, err := crypto.Decrypt(user.Pin)
 	if err != nil || p != pin {
-		return fmt.Errorf("invalid user credentials")
+		return fmt.Errorf("Invalid user credentials")
 	}
 
 	return nil
@@ -93,7 +108,7 @@ func execUser(username, pin string, db *sql.DB) error {
 func fetchUserNotes(username string, db *sql.DB) ([]types.NotesTable, error) {
 	var notes []types.NotesTable
 
-	query := "SELECT id, content, username, created_at FROM notes WHERE username = ?"
+	query := "SELECT id, content, username, created_at FROM notes WHERE username = ? ORDER BY created_at DESC"
 	rows, err := db.Query(query, username)
 	if err != nil {
 		return notes, errors.New("error while fetching user's notes")

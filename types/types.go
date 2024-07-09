@@ -17,5 +17,5 @@ type NotesTable struct {
 	Id        string
 	Content   string
 	Username  string
-	CreatedAt time.Time
+	CreatedAt string // time.Time
 }

@@ -23,3 +23,6 @@ go.work.sum
 
 # DB file
 main.db
+
+node_modules
+*.yaml

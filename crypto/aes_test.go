@@ -9,7 +9,7 @@ import (
 func TestAESEncrypt(t *testing.T) {
 	v := "123456"
 
-	cipher, err := AESEncrypt(v)
+	cipher, err := Encrypt(v)
 	if err != nil {
 		t.Fatal(err)
 		return
@@ -17,7 +17,7 @@ func TestAESEncrypt(t *testing.T) {
 
 	t.Log("Cipher: ", cipher)
 
-	decodedValue, err := AESDecrypt(cipher)
+	decodedValue, err := Decrypt(cipher)
 	if err != nil {
 		t.Fatal(err)
 		return

@@ -3,17 +3,14 @@ package db
 import (
 	"database/sql"
 	"log"
-	"os"
-
-	"github.com/samocodes/go-priv-notes/env"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func Load() *sql.DB {
-	if env.DefaultConfig.ENVIRONMENT == "dev" {
-		os.Remove("./main.db")
-	}
+	// if env.DefaultConfig.ENVIRONMENT == "dev" {
+	// 	os.Remove("./main.db")
+	// }
 
 	db, err := sql.Open("sqlite3", "./main.db")
 	if err != nil {

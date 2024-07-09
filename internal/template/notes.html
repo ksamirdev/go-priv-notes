@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Private Notes</title>
+
+        <link href="/dist/main.css" rel="stylesheet" />
+
+        <!-- GOOGLE FONTS -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+            rel="stylesheet"
+        />
+        <!-- GOOGLE FONTS END -->
+    </head>
+    <body class="container space-y-4 font-poppins py-5">
+        <h1 class="text-5xl text-center font-bold underline decoration-wavy">
+            Private Notes - {{.Username}}
+        </h1>
+
+        {{ if .Error }}
+
+        <div class="border-2 border-red-500 bg-red-100 p-5 rounded-xl">
+            <h1
+                class="text-red-700 font-bold text-lg inline-flex items-center gap-1"
+            >
+                <i data-lucide="circle-alert"></i>
+
+                Error
+            </h1>
+            <p>{{.Message}}</p>
+        </div>
+
+        {{ else }} {{ if not .Notes}} Nobody sent you any note {{ else }}
+
+        <ul class="grid grid-cols-5 gap-3 items-start">
+            {{range .Notes}}
+            <li class="border p-2 rounded-lg">
+                <p>{{.Content}}</p>
+                <span class="text-xs text-neutral-500">{{.CreatedAt}}</span>
+            </li>
+
+            {{end}}
+        </ul>
+        {{ end }} {{ end }}
+
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <script>
+            lucide.createIcons();
+        </script>
+    </body>
+</html>

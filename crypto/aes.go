@@ -16,7 +16,7 @@ var (
 	secretKey string = "N1PCdw3M2B1TfJhoaY2mL736p2vCUc47"
 )
 
-func AESEncrypt(message string) (string, error) {
+func Encrypt(message string) (string, error) {
 	byteMsg := []byte(message)
 
 	block, err := aes.NewCipher([]byte(secretKey))
@@ -38,7 +38,7 @@ func AESEncrypt(message string) (string, error) {
 	return base64.StdEncoding.EncodeToString(cipherText), nil
 }
 
-func AESDecrypt(message string) (string, error) {
+func Decrypt(message string) (string, error) {
 	cipherText, err := base64.StdEncoding.DecodeString(message)
 	if err != nil {
 		return "", fmt.Errorf("could not base64 decode: %v", err)

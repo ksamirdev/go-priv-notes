@@ -2,7 +2,7 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
+	"html/template"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -11,14 +11,18 @@ import (
 func Router(db *sql.DB) http.Handler {
 	router := chi.NewRouter()
 
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Hello World!")
+	// serve css
+	router.Get("/dist/main.css", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "internal/template/dist/main.css")
 	})
 
-	router.Route("/api/v1", func(r chi.Router) {
-		r.Mount("/user", UserRouter(db))
-		r.Mount("/note", NoteRouter(db))
+	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.ParseFiles("internal/template/index.html"))
+		tmpl.Execute(w, nil)
 	})
+
+	router.Mount("/user", UserRouter(db))
+	router.Mount("/note", NoteRouter(db))
 
 	return router
 }

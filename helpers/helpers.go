@@ -1,8 +1,10 @@
 package helpers
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
+	"time"
 )
 
 var (
@@ -30,4 +32,26 @@ func IsValidPin(pin string) bool {
 
 func IsURLEncodedFormValid(r *http.Request) bool {
 	return r.Header.Get("Content-Type") == "application/x-www-form-urlencoded"
+}
+
+func ReadableTime(t time.Time) string {
+	now := time.Now()
+	diff := now.Sub(t)
+
+	switch {
+	case diff < time.Minute:
+		return fmt.Sprintf("%d seconds ago", int(diff.Seconds()))
+	case diff < time.Hour:
+		return fmt.Sprintf("%d minutes ago", int(diff.Minutes()))
+	case diff < time.Hour*24:
+		return fmt.Sprintf("%d hours ago", int(diff.Hours()))
+	case diff < time.Hour*24*7:
+		return fmt.Sprintf("%d days ago", int(diff.Hours()/24))
+	case diff < time.Hour*24*30:
+		return fmt.Sprintf("%d weeks ago", int(diff.Hours()/(24*7)))
+	case diff < time.Hour*24*365:
+		return fmt.Sprintf("%d months ago", int(diff.Hours()/(24*30)))
+	default:
+		return fmt.Sprintf("%d years ago", int(diff.Hours()/(24*365)))
+	}
 }
