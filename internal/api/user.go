@@ -19,14 +19,12 @@ type NotesResponse struct {
 	Message string
 
 	Username string
-	Notes    []types.NotesTable
+	Notes    []types.Notes
 }
 
 func UserRouter(db *sql.DB) chi.Router {
 	r := chi.NewRouter()
 
-	// returns all notes of a user
-	// if user dont exists, create one and fetch the notes
 	// TODO: pagination
 	r.Get("/notes", func(w http.ResponseWriter, r *http.Request) {
 		// gets username, and pin from url query
@@ -37,16 +35,12 @@ func UserRouter(db *sql.DB) chi.Router {
 
 		if !helpers.IsValidUsername(username) || !helpers.IsValidPin(pin) {
 			tmpl.Execute(w, NotesResponse{Error: true, Message: "Either username or pin is invalid", Username: username})
-
-			// http.Error(w, "Either username or pin is invalid", http.StatusUnauthorized)
 			return
 		}
 
 		// check if user exists or create one
-		if err := execUser(username, pin, db); err != nil {
+		if err := createOrFindUser(username, pin, db); err != nil {
 			tmpl.Execute(w, NotesResponse{Error: true, Message: err.Error(), Username: username})
-
-			// http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -77,7 +71,7 @@ func createUser(username, pin string, db *sql.DB) error {
 	return nil
 }
 
-func execUser(username, pin string, db *sql.DB) error {
+func createOrFindUser(username, pin string, db *sql.DB) error {
 	// fetch the user
 	var user types.UsersTable
 
@@ -105,10 +99,10 @@ func execUser(username, pin string, db *sql.DB) error {
 	return nil
 }
 
-func fetchUserNotes(username string, db *sql.DB) ([]types.NotesTable, error) {
-	var notes []types.NotesTable
+func fetchUserNotes(username string, db *sql.DB) ([]types.Notes, error) {
+	var notes []types.Notes
 
-	query := "SELECT id, content, username, created_at FROM notes WHERE username = ? ORDER BY created_at DESC"
+	query := "SELECT id, content, created_at FROM notes WHERE username = ? ORDER BY created_at DESC"
 	rows, err := db.Query(query, username)
 	if err != nil {
 		return notes, errors.New("error while fetching user's notes")
@@ -117,11 +111,15 @@ func fetchUserNotes(username string, db *sql.DB) ([]types.NotesTable, error) {
 
 	for rows.Next() {
 		var note types.NotesTable
-		if err := rows.Scan(&note.Id, &note.Content, &note.Username, &note.CreatedAt); err != nil {
+		if err := rows.Scan(&note.Id, &note.Content, &note.CreatedAt); err != nil {
 			continue
 		}
 
-		notes = append(notes, note)
+		notes = append(notes, types.Notes{
+			Id:        note.Id,
+			Content:   note.Content,
+			CreatedAt: helpers.ReadableTime(note.CreatedAt),
+		})
 	}
 
 	return notes, nil

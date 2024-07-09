@@ -17,7 +17,7 @@ func NoteRouter(db *sql.DB) chi.Router {
 
 	r.Post("/send", func(w http.ResponseWriter, r *http.Request) {
 		if !helpers.IsURLEncodedFormValid(r) {
-			http.Error(w, "Invalid request", http.StatusBadRequest)
+			fmt.Fprintf(w, "Invalid request")
 			return
 		}
 
@@ -25,12 +25,12 @@ func NoteRouter(db *sql.DB) chi.Router {
 		username := r.FormValue("username")
 
 		if content == "" || username == "" {
-			http.Error(w, "Either content or username was not provided", http.StatusBadRequest)
+			fmt.Fprintf(w, "Either content or username was not provided")
 			return
 		}
 
 		if !helpers.IsValidUsername(username) {
-			http.Error(w, helpers.ErrInvalidUsername, http.StatusBadRequest)
+			fmt.Fprintf(w, helpers.ErrInvalidUsername)
 			return
 		}
 
@@ -38,23 +38,23 @@ func NoteRouter(db *sql.DB) chi.Router {
 		row := db.QueryRow("SELECT * FROM users WHERE username = ?", username)
 		if err := row.Scan(&user.Username, &user.Pin, &user.CreatedAt); err != nil {
 			if err == sql.ErrNoRows {
-				http.Error(w, "User with this username does not exist", http.StatusBadRequest)
+				fmt.Fprintf(w, "User with this username does not exist")
 				return
 			}
 
-			http.Error(w, "Error querying user", http.StatusInternalServerError)
+			fmt.Fprintf(w, "Error querying user")
 			return
 		}
 
 		id, err := uuid.NewV7()
 		if err != nil {
-			http.Error(w, fmt.Sprintf("UUIDV7 raised an issue: %s", err.Error()), http.StatusInternalServerError)
+			fmt.Fprintf(w, "UUIDV7 raised an issue: %s", err.Error())
 			return
 		}
 
 		_, err = db.Exec(`INSERT INTO notes(id, content, username) VALUES (?, ?, ?)`, id.String(), content, username)
 		if err != nil {
-			http.Error(w, "Issue when inserting the item", http.StatusInternalServerError)
+			fmt.Fprintf(w, "Issue when inserting the item")
 			return
 		}
 
