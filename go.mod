@@ -1,4 +1,4 @@
-module github.com/samocodes/go-priv-notes
+module github.com/ksamirdev/go-priv-notes
 
 go 1.22.5
 
